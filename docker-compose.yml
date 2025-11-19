@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.gpu
-    image: aigvdet:gpu
+    image: sacdalance/thesis-aigvdet:gpu
     container_name: aigvdet-gpu
     runtime: nvidia
     environment:
@@ -34,7 +34,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.cpu
-    image: aigvdet:cpu
+    image: sacdalance/thesis-aigvdet:cpu
     container_name: aigvdet-cpu
     volumes:
       - ./data:/app/data

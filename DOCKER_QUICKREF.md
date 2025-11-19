@@ -1,5 +1,15 @@
 # AIGVDet Docker Quick Reference
 
+## Pull from Docker Hub
+
+```bash
+# Pull GPU version
+docker pull sacdalance/thesis-aigvdet:gpu
+
+# Pull CPU version
+docker pull sacdalance/thesis-aigvdet:cpu
+```
+
 ## Build Images
 
 ### Windows (PowerShell)
@@ -51,7 +61,7 @@ docker run --gpus all -it --rm `
   -v ${PWD}/checkpoints:/app/checkpoints `
   -v ${PWD}/raft_model:/app/raft_model `
   -p 6006:6006 `
-  aigvdet:gpu `
+  sacdalance/thesis-aigvdet:gpu `
   python3.11 train.py --gpus 0 --exp_name my_experiment
 ```
 
@@ -61,7 +71,7 @@ docker run -it --rm `
   -v ${PWD}/data:/app/data `
   -v ${PWD}/checkpoints:/app/checkpoints `
   -p 6006:6006 `
-  aigvdet:cpu `
+  sacdalance/thesis-aigvdet:cpu `
   python train.py --exp_name my_experiment
 ```
 
@@ -72,7 +82,7 @@ docker run --gpus all -it --rm \
   -v $(pwd)/checkpoints:/app/checkpoints \
   -v $(pwd)/raft_model:/app/raft_model \
   -p 6006:6006 \
-  aigvdet:gpu \
+  sacdalance/thesis-aigvdet:gpu \
   python3.11 train.py --gpus 0 --exp_name my_experiment
 ```
 

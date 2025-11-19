@@ -36,11 +36,7 @@ COPY train.sh test.sh demo.sh ./
 # Create directories for data and checkpoints
 RUN mkdir -p /app/data /app/checkpoints /app/raft_model
 
-# Install Python dependencies with CPU support
-RUN uv pip install --system torch==2.0.0+cpu torchvision==0.15.1+cpu \
-    --index-url https://download.pytorch.org/whl/cpu
-
-# Install other dependencies
+# Install other dependencies first
 RUN uv pip install --system \
     einops \
     imageio \
@@ -55,8 +51,12 @@ RUN uv pip install --system \
     tqdm \
     "blobfile>=1.0.5"
 
+# Install PyTorch CPU version using pip directly
+RUN pip3 install torch==2.0.0+cpu torchvision==0.15.1+cpu \
+    --index-url https://download.pytorch.org/whl/cpu
+
 # Set Python path
-ENV PYTHONPATH=/app:$PYTHONPATH
+ENV PYTHONPATH=/app
 
 # Expose tensorboard port
 EXPOSE 6006

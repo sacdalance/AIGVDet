@@ -1,5 +1,5 @@
-# Dockerfile for AIGVDet with GPU support (CUDA 11.7)
-FROM nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu22.04
+# Alternative GPU Dockerfile using PyTorch base image (avoids large download)
+FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -9,9 +9,6 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    python3.11 \
-    python3.11-dev \
-    python3-pip \
     git \
     wget \
     curl \
@@ -40,7 +37,7 @@ COPY train.sh test.sh demo.sh ./
 # Create directories for data and checkpoints
 RUN mkdir -p /app/data /app/checkpoints /app/raft_model
 
-# Install other dependencies first
+# Install dependencies (PyTorch already included in base image)
 RUN uv pip install --system \
     einops \
     imageio \
@@ -55,9 +52,10 @@ RUN uv pip install --system \
     tqdm \
     "blobfile>=1.0.5"
 
-# Install PyTorch GPU version using pip directly
-RUN pip3 install torch==2.0.0+cu117 torchvision==0.15.1+cu117 \
-    --index-url https://download.pytorch.org/whl/cu117
+# Install torchvision separately (base image has torch but may need torchvision update)
+RUN pip3 install torchvision==0.15.1+cu117 \
+    --index-url https://download.pytorch.org/whl/cu117 || \
+    pip3 install torchvision==0.15.1
 
 # Set Python path
 ENV PYTHONPATH=/app
@@ -66,4 +64,4 @@ ENV PYTHONPATH=/app
 EXPOSE 6006
 
 # Default command
-CMD ["python3.11", "train.py", "--help"]
+CMD ["/bin/bash"]
