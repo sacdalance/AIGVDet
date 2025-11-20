@@ -4,6 +4,7 @@ einops
 imageio
 ipympl
 matplotlib
+natsort
 numpy
 opencv-python
 pandas

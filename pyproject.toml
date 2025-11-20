@@ -17,6 +17,7 @@ dependencies = [
     "imageio",
     "ipympl",
     "matplotlib",
+    "natsort",
     "numpy<2.0",
     "opencv-python",
     "pandas",
