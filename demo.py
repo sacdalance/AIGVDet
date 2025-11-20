@@ -42,9 +42,12 @@ def viz(img, flo, folder_optical_flow_path, imfile1):
     flo = flow_viz.flow_to_image(flo)
     img_flo = np.concatenate([img, flo], axis=0)
 
+
+    # print(folder_optical_flow_path)
     # Use os.path.basename to get filename (works on both Windows and Linux)
     content = os.path.basename(imfile1)
     folder_optical_flow_path = os.path.join(folder_optical_flow_path, content)
+    print(folder_optical_flow_path)
     cv2.imwrite(folder_optical_flow_path, flo)
 
 
@@ -98,7 +101,8 @@ def OF_gen(args):
         images = video_to_frames(args.path, args.folder_original_path)
         images = natsorted(images)
 
-        for imfile1, imfile2 in tqdm(zip(images[:-1], images[1:]), total=len(images)-1, desc="Generating optical flow", unit="frame"):
+        print("Generating optical flow...")
+        for imfile1, imfile2 in tqdm(zip(images[:-1], images[1:]), total=len(images)-1, desc="Processing optical flow", unit="frame"):
             image1 = load_image(imfile1)
             image2 = load_image(imfile2)
 
