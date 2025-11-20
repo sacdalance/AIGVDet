@@ -10,8 +10,8 @@ class DefaultConfigs(ABC):
     gpus = [0]
     seed = 3407
     arch = "resnet50"
-    datasets = ["zhaolian_train"]
-    datasets_test = ["adm_res_abs_ddim20s"]
+    datasets = ["train"]
+    datasets_test = ["val"]
     mode = "binary"
     class_bal = False
     batch_size = 64
