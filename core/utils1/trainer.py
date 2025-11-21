@@ -4,9 +4,9 @@ import torch
 import torch.nn as nn
 from torch.nn import init
 
-from utils1.config import CONFIGCLASS
-from utils1.utils import get_network
-from utils1.warmup import GradualWarmupScheduler
+from core.utils1.config import CONFIGCLASS
+from core.utils1.utils import get_network
+from core.utils1.warmup import GradualWarmupScheduler
 
 
 class BaseModel(nn.Module):
