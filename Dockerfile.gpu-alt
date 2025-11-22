@@ -51,7 +51,8 @@ RUN uv pip install --system \
     tensorboard \
     tensorboardX \
     tqdm \
-    "blobfile>=1.0.5"
+    "blobfile>=1.0.5" \
+    wandb
 
 # Install torchvision separately (base image has torch but may need torchvision update)
 RUN pip3 install torchvision==0.15.1+cu117 \
