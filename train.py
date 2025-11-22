@@ -5,6 +5,7 @@ import time
 
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
+import wandb
 
 from core.utils1.datasets import create_dataloader
 from core.utils1.earlystop import EarlyStopping
@@ -40,6 +41,17 @@ if __name__ == "__main__":
     val_writer = SummaryWriter(os.path.join(cfg.exp_dir, "val"))
     print(f"✓ Logs will be saved to: {cfg.exp_dir}")
 
+    # Initialize wandb
+    print("\nInitializing wandb...")
+    wandb.init(
+        project="aigvdet-training",
+        name=cfg.exp_name,
+        config=cfg.to_dict(),
+        dir=cfg.exp_dir,
+        resume="allow" if cfg.continue_train else None
+    )
+    print(f"✓ wandb tracking enabled: {wandb.run.url}")
+
     print("\nInitializing model...")
     trainer = Trainer(cfg)
     early_stopping = EarlyStopping(patience=cfg.earlystop_epoch, delta=-0.001, verbose=True)
@@ -67,6 +79,7 @@ if __name__ == "__main__":
             # if trainer.total_steps % cfg.loss_freq == 0:
             #     log.write(f"Train loss: {trainer.loss} at step: {trainer.total_steps}\n")
             train_writer.add_scalar("loss", trainer.loss, trainer.total_steps)
+            wandb.log({"train/loss": trainer.loss, "train/step": trainer.total_steps})
 
             if trainer.total_steps % cfg.save_latest_freq == 0:
                 print(f"💾 Saving checkpoint (epoch {epoch+1}, step {trainer.total_steps})")
@@ -93,6 +106,26 @@ if __name__ == "__main__":
         val_writer.add_scalar("TPR", val_results["TPR"], trainer.total_steps)
         val_writer.add_scalar("TNR", val_results["TNR"], trainer.total_steps)
         
+        # Log validation metrics to wandb
+        wandb.log({
+            "val/AP": val_results["AP"],
+            "val/ACC": val_results["ACC"],
+            "val/AUC": val_results["AUC"],
+            "val/TPR": val_results["TPR"],
+            "val/TNR": val_results["TNR"],
+            "epoch": epoch
+        })
+        
+        # Save best checkpoint as wandb artifact
+        if os.path.exists(os.path.join(cfg.ckpt_dir, "model_epoch_best.pth")):
+            artifact = wandb.Artifact(
+                name=f"{cfg.exp_name}_best_model",
+                type="model",
+                description=f"Best model checkpoint at epoch {epoch}"
+            )
+            artifact.add_file(os.path.join(cfg.ckpt_dir, "model_epoch_best.pth"))
+            wandb.log_artifact(artifact)
+        
         print(f"✓ Validation Results - AP: {val_results['AP']:.4f} | ACC: {val_results['ACC']:.4f} | AUC: {val_results['AUC']:.4f}")
         log.write(f"(Val @ epoch {epoch}) AP: {val_results['AP']}; ACC: {val_results['ACC']}\n")
 
@@ -111,3 +144,7 @@ if __name__ == "__main__":
             # print(trainer.scheduler.get_lr()[0])
             trainer.scheduler.step()
         trainer.train()
+    
+    # Finish wandb run
+    print("\n✓ Training complete! Finalizing W&B...")
+    wandb.finish()
