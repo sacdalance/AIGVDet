@@ -14,11 +14,11 @@ class DefaultConfigs(ABC):
     datasets_test = ["val_set_1"]
     mode = "binary"
     class_bal = False
-    batch_size = 64
+    batch_size = 16  # Reduced from 64 to 16 for 4GB GPU
     loadSize = 256
     cropSize = 224
     epoch = "latest"
-    num_workers = 20
+    num_workers = 4  # Reduced from 20 to 4 to avoid shared memory issues
     serial_batches = False
     isTrain = True
 
