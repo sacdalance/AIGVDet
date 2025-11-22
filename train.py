@@ -46,7 +46,7 @@ if __name__ == "__main__":
     wandb.init(
         project="aigvdet-training",
         name=cfg.exp_name,
-        config=cfg.to_dict(),
+        config=cfg.to_dict(),   
         dir=cfg.exp_dir,
         resume="allow" if cfg.continue_train else None
     )

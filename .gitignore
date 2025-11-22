@@ -3,6 +3,10 @@ data/
 checkpoints/
 raft_model/
 
+# Environment variables (contains secrets)
+.env
+.env.example
+
 # Generated output folders
 frame/
 optical_result/
