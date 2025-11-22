@@ -59,7 +59,7 @@ class DefaultConfigs(ABC):
     pretrained = True
 
     # paths information
-    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     dataset_root = os.path.join(root_dir, "data")
     exp_root = os.path.join(root_dir, "data", "exp")
     _exp_name = ""
