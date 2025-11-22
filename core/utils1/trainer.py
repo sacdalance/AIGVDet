@@ -18,7 +18,6 @@ class BaseModel(nn.Module):
         self.save_dir = cfg.ckpt_dir
         self.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         self.model:nn.Module
-        self.model=nn.Module.to(self.device)
         # self.model.to(self.device)
         #self.model.load_state_dict(torch.load('./checkpoints/optical.pth'))
         self.optimizer: torch.optim.Optimizer

@@ -57,10 +57,19 @@ def validate(model: nn.Module, cfg: CONFIGCLASS):
     f_acc = accuracy_score(y_true[y_true == 1], y_pred[y_true == 1] > 0.5)
     acc = accuracy_score(y_true, y_pred > 0.5)
     ap = average_precision_score(y_true, y_pred)
+    auc = roc_auc_score(y_true, y_pred)
+    
+    # Calculate TPR (True Positive Rate / Recall) and TNR (True Negative Rate / Specificity)
+    tpr = f_acc  # TPR is the accuracy on fake samples (class 1)
+    tnr = r_acc  # TNR is the accuracy on real samples (class 0)
+    
     results = {
         "ACC": acc,
         "AP": ap,
+        "AUC": auc,
         "R_ACC": r_acc,
         "F_ACC": f_acc,
+        "TPR": tpr,
+        "TNR": tnr,
     }
     return results
