@@ -3,6 +3,7 @@ from core.utils1.config import cfg  # isort: split
 import os
 import time
 
+from dotenv import load_dotenv
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
 import wandb
@@ -15,6 +16,17 @@ from core.utils1.utils import Logger
 
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Set wandb API key from environment
+wandb_api_key = os.getenv("WANDB")
+if wandb_api_key:
+    os.environ["WANDB_API_KEY"] = wandb_api_key
+    print(f"✓ Loaded wandb API key from .env")
+else:
+    print("⚠️  Warning: WANDB API key not found in .env file")
 
 
 if __name__ == "__main__":
@@ -135,10 +147,12 @@ if __name__ == "__main__":
                 if trainer.adjust_learning_rate():
                     print("📉 Learning rate dropped by 10, continuing training...")
                     log.write("Learning rate dropped by 10, continue training...\n")
+                    wandb.log({"early_stopping/lr_dropped": True, "epoch": epoch})
                     early_stopping = EarlyStopping(patience=cfg.earlystop_epoch, delta=-0.002, verbose=True)
                 else:
                     print("\n⏹️  Early stopping triggered")
                     log.write("Early stopping.\n")
+                    wandb.log({"early_stopping/triggered": True, "epoch": epoch})
                     break
         if cfg.warmup:
             # print(trainer.scheduler.get_lr()[0])

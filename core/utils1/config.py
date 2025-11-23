@@ -14,11 +14,11 @@ class DefaultConfigs(ABC):
     datasets_test = ["val_set_1"]
     mode = "binary"
     class_bal = False
-    batch_size = 16  # Reduced from 64 to 16 for 4GB GPU
+    batch_size = 64  # RTX 3090 24GB can handle original batch size
     loadSize = 256
     cropSize = 224
     epoch = "latest"
-    num_workers = 4  # Reduced from 20 to 4 to avoid shared memory issues
+    num_workers = 16  # Increased for faster data loading on 24GB GPU
     serial_batches = False
     isTrain = True
 

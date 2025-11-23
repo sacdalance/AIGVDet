@@ -27,6 +27,7 @@ dependencies = [
     "tqdm",
     "blobfile>=1.0.5",
     "wandb",
+    "python-dotenv",
     "pip",
 ]
 

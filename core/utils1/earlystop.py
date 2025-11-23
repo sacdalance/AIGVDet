@@ -1,4 +1,5 @@
 import numpy as np
+import wandb
 
 from core.utils1.trainer import Trainer
 
@@ -44,3 +45,10 @@ class EarlyStopping:
             print(f"Validation accuracy increased ({self.score_max:.6f} --> {score:.6f}).  Saving model ...")
         trainer.save_networks("best")
         self.score_max = score
+        
+        # Log best model save to wandb
+        if wandb.run is not None:
+            wandb.log({
+                "best_model/score": score,
+                "best_model/improvement": score - self.score_max if self.score_max != -np.Inf else 0
+            })

@@ -51,7 +51,8 @@ RUN uv pip install --system \
     tensorboardX \
     tqdm \
     "blobfile>=1.0.5" \
-    wandb
+    wandb \
+    python-dotenv
 
 # Install PyTorch CPU version using pip directly
 RUN pip3 install torch==2.0.0+cpu torchvision==0.15.1+cpu \
