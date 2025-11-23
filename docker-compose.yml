@@ -12,11 +12,14 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - CUDA_VISIBLE_DEVICES=0
+    env_file:
+      - .env
     volumes:
       - ./data:/app/data
       - ./checkpoints:/app/checkpoints
       - ./raft_model:/app/raft_model
       - ./logs:/app/logs
+      - ./.env:/app/.env:ro
     ports:
       - "6006:6006"
     shm_size: '8gb'
@@ -36,11 +39,14 @@ services:
       dockerfile: Dockerfile.cpu
     image: sacdalance/thesis-aigvdet:cpu
     container_name: aigvdet-cpu
+    env_file:
+      - .env
     volumes:
       - ./data:/app/data
       - ./checkpoints:/app/checkpoints
       - ./raft_model:/app/raft_model
       - ./logs:/app/logs
+      - ./.env:/app/.env:ro
     ports:
       - "6007:6006"
     shm_size: '4gb'
