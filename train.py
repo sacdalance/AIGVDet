@@ -18,12 +18,12 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv('thesis.env')
 
 # Set wandb API key from environment
 wandb_api_key = os.getenv("WANDB")
 if wandb_api_key:
-    os.environ["WANDB_API_KEY"] = wandb_api_key
+    os.environ["WANDB"] = wandb_api_key
     print(f"✓ Loaded wandb API key from .env")
 else:
     print("⚠️  Warning: WANDB API key not found in .env file")

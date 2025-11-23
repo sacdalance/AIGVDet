@@ -32,7 +32,7 @@ COPY README.md ./
 COPY core/ ./core/
 COPY networks/ ./networks/
 COPY train.py test.py demo.py ./
-COPY train.sh test.sh demo.sh ./
+COPY train.sh test.sh demo.sh download_data.sh ./
 
 # Create directories for data and checkpoints
 RUN mkdir -p /app/data /app/checkpoints /app/raft_model
