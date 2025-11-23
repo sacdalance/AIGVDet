@@ -2,7 +2,22 @@
 
 ## Quick Start
 
-### 1. Create Data Structure
+### 1. Automated Data Deployment (Recommended for Vast.ai)
+Since the dataset is large (27GB+), we use a startup script to download it directly to the VM.
+
+1.  **Start your instance** (Vast.ai, AWS, etc.).
+2.  **Open a terminal** in the container.
+3.  **Run the download script**:
+    ```bash
+    # This will download the dataset from Google Drive and unzip it
+    chmod +x download_data.sh
+    ./download_data.sh
+    ```
+    *Note: The script defaults to the project's Google Drive ID. You can pass a different ID if needed: `./download_data.sh <YOUR_FILE_ID>`*
+
+### 2. Manual Data Setup (Local Development)
+If you are running locally or want to set up manually:
+
 ```bash
 # Run the setup script
 python setup_data_structure.py
