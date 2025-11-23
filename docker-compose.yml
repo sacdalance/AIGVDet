@@ -5,13 +5,15 @@ services:
   aigvdet-gpu:
     build:
       context: .
-      dockerfile: Dockerfile.gpu
+      dockerfile: Dockerfile.gpu-alt
     image: sacdalance/thesis-aigvdet:gpu
     container_name: aigvdet-gpu
     runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - CUDA_VISIBLE_DEVICES=0
+      - WANDB=${WANDB}
+      - PYTHONPATH=/app
     env_file:
       - .env
     volumes:
@@ -30,7 +32,7 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    command: python3.11 train.py --gpus 0 --exp_name default_exp
+    command: python train.py --gpus 0 --exp_name default_exp
     
   # CPU service
   aigvdet-cpu:
@@ -39,6 +41,9 @@ services:
       dockerfile: Dockerfile.cpu
     image: sacdalance/thesis-aigvdet:cpu
     container_name: aigvdet-cpu
+    environment:
+      - WANDB=${WANDB}
+      - PYTHONPATH=/app
     env_file:
       - .env
     volumes:
