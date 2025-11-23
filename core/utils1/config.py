@@ -51,7 +51,7 @@ class DefaultConfigs(ABC):
     continue_train = False
     epoch_count = 1
     last_epoch = -1
-    nepoch = 400
+    nepoch = 100
     beta1 = 0.9
     lr = 0.0001
     init_type = "normal"
