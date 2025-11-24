@@ -26,7 +26,7 @@ if wandb_api_key:
     os.environ["WANDB"] = wandb_api_key
     print(f"✓ Loaded wandb API key from .env")
 else:
-    print("⚠️  Warning: WANDB API key not found in .env file")
+    print("⚠️ Warning: WANDB API key not found in .env file")
 
 
 if __name__ == "__main__":
@@ -164,7 +164,7 @@ if __name__ == "__main__":
                     wandb.log({"early_stopping/lr_dropped": True, "epoch": epoch})
                     early_stopping = EarlyStopping(patience=cfg.earlystop_epoch, delta=-0.002, verbose=True)
                 else:
-                    print("\n⏹️  Early stopping triggered")
+                    print("\n⏹️ Early stopping triggered")
                     log.write("Early stopping.\n")
                     wandb.log({"early_stopping/triggered": True, "epoch": epoch})
                     break

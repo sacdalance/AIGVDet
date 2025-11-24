@@ -14,11 +14,11 @@ class DefaultConfigs(ABC):
     datasets_test = ["val_set_1"]
     mode = "binary"
     class_bal = False
-    batch_size = 64  # RTX 3090 24GB can handle original batch size
+    batch_size = 64 # RTX 3090 24GB can handle original batch size
     loadSize = 512 # Resizes the image, this is used as it is standard for HIGH RES CNNs and must have margin before cropping
     cropSize = 448
     epoch = "latest"
-    num_workers = 8  # Increased for faster data loading on 24GB GPU (choose 8 or 16) - doesnt affect accuracy but only throughput
+    num_workers = 16  # Increased for faster data loading on 24GB GPU (choose 8 or 16) - doesnt affect accuracy but only throughput
     serial_batches = False
     isTrain = True
 
@@ -31,7 +31,7 @@ class DefaultConfigs(ABC):
     jpg_prob = 0.05
     # P(augmented) = 1-(1-0.5)(1-0.05) = 0.9
     jpg_method = ["cv2"]
-    jpg_qual = [75]
+    jpg_qual = list(range(70, 91))
     gray_prob = 0.0
     aug_resize = True
     aug_crop = True
@@ -54,7 +54,7 @@ class DefaultConfigs(ABC):
     epoch_count = 1
     last_epoch = -1
     # nepoch = 100, try
-    nepoch = 20
+    nepoch = 50
     beta1 = 0.9
     lr = 0.0001
     init_type = "normal"
