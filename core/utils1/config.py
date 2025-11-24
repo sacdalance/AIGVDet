@@ -29,7 +29,7 @@ class DefaultConfigs(ABC):
     blur_sig = [0.5]
     # jpg_prob = 0.1 - resnet50 template
     jpg_prob = 0.05
-    # P(augmented) = 1-(1-0.5)(1-0.05) = 0.975
+    # P(augmented) = 1-(1-0.5)(1-0.05) = 0.9
     jpg_method = ["cv2"]
     jpg_qual = [75]
     gray_prob = 0.0
@@ -43,18 +43,18 @@ class DefaultConfigs(ABC):
     # warmup = True
     warmup_epoch = 3
     # earlystop = True - resnet50 template, training ends only when lr reaches 1e-6 which trainer already supports (Trainer.adjust_learning_rate(min_lr=1e-6))
-    earlystop = False
+    earlystop = True
     earlystop_epoch = 5
     optim = "adam"
     new_optim = False
     loss_freq = 400
     save_latest_freq = 2000
-    save_epoch_freq = 20
+    save_epoch_freq = 5
     continue_train = False
     epoch_count = 1
     last_epoch = -1
     # nepoch = 100, try
-    nepoch = 400
+    nepoch = 20
     beta1 = 0.9
     lr = 0.0001
     init_type = "normal"
