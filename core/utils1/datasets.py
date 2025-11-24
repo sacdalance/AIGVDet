@@ -27,20 +27,30 @@ def dataset_folder(root: str, cfg: CONFIGCLASS):
 
 
 def binary_dataset(root: str, cfg: CONFIGCLASS):
-    identity_transform = transforms.Lambda(lambda img: img)
-    
-    rz_func = identity_transform
-    
-    if cfg.isTrain:
-        crop_func = transforms.RandomCrop((448,448))
-    else:
-        crop_func = transforms.CenterCrop((448,448)) if cfg.aug_crop else identity_transform
+    # identity_transform = transforms.Lambda(lambda img: img) 
+    # rz_func = identity_transform
+    # issue here, destroys performance as no resizing happens at all that go straight to cropping even if they are different resolutions
 
+    identity_transform = transforms.Lambda(lambda img: img)
+
+    # Enable resize (paper implies resize > crop for random cropping)
+    if cfg.aug_resize:
+        rz_func = transforms.Lambda(lambda img: custom_resize(img, cfg))
+    else:
+        rz_func = identity_transform
+
+    # Crop to cfg.cropSize (paper uses 448)
+    if cfg.isTrain:
+        crop_func = transforms.RandomCrop((cfg.cropSize, cfg.cropSize))
+    else:
+        crop_func = transforms.CenterCrop((cfg.cropSize, cfg.cropSize)) if cfg.aug_crop else identity_transform
+
+    # Flip only in training if enabled
     if cfg.isTrain and cfg.aug_flip:
         flip_func = transforms.RandomHorizontalFlip()
     else:
-        flip_func = identity_transform
-    
+        flip_func = identity_transform # fallback
+
 
     return datasets.ImageFolder(
         root,
@@ -48,8 +58,8 @@ def binary_dataset(root: str, cfg: CONFIGCLASS):
             [
                 rz_func,
                 #change
-                transforms.Lambda(lambda img: blur_jpg_augment(img, cfg)),
                 crop_func,
+                transforms.Lambda(lambda img: blur_jpg_augment(img, cfg)),
                 flip_func,
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
