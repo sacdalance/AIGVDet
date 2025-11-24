@@ -15,10 +15,10 @@ class DefaultConfigs(ABC):
     mode = "binary"
     class_bal = False
     batch_size = 64  # RTX 3090 24GB can handle original batch size
-    loadSize = 256
-    cropSize = 224
+    loadSize = 448
+    cropSize = 448
     epoch = "latest"
-    num_workers = 16  # Increased for faster data loading on 24GB GPU
+    num_workers = 8  # Increased for faster data loading on 24GB GPU
     serial_batches = False
     isTrain = True
 

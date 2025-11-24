@@ -69,6 +69,9 @@ if __name__ == "__main__":
     early_stopping = EarlyStopping(patience=cfg.earlystop_epoch, delta=-0.001, verbose=True)
     print(f"✓ Model ready (Architecture: {cfg.arch})")
     
+    # Track best model accuracy
+    best_acc = 0.0
+    
     print("\n" + "=" * 60)
     print(f"Starting training for {cfg.nepoch} epochs")
     print("=" * 60 + "\n")
@@ -128,18 +131,29 @@ if __name__ == "__main__":
             "epoch": epoch
         })
         
-        # Save best checkpoint as wandb artifact
-        if os.path.exists(os.path.join(cfg.ckpt_dir, "model_epoch_best.pth")):
-            artifact = wandb.Artifact(
-                name=f"{cfg.exp_name}_best_model",
-                type="model",
-                description=f"Best model checkpoint at epoch {epoch}"
-            )
-            artifact.add_file(os.path.join(cfg.ckpt_dir, "model_epoch_best.pth"))
-            wandb.log_artifact(artifact)
-        
         print(f"✓ Validation Results - AP: {val_results['AP']:.4f} | ACC: {val_results['ACC']:.4f} | AUC: {val_results['AUC']:.4f}")
         log.write(f"(Val @ epoch {epoch}) AP: {val_results['AP']}; ACC: {val_results['ACC']}\n")
+
+        # Save best model if accuracy improves
+        if val_results['ACC'] > best_acc:
+            print(f"⭐ New best model! (ACC: {best_acc:.4f} -> {val_results['ACC']:.4f})")
+            best_acc = val_results['ACC']
+            trainer.save_networks("best")
+            
+            best_model_path = os.path.join(cfg.ckpt_dir, "model_epoch_best.pth")
+            if os.path.exists(best_model_path):
+                # 1. Log as Artifact
+                artifact = wandb.Artifact(
+                    name=f"{cfg.exp_name}_best_model",
+                    type="model",
+                    description=f"Best model checkpoint at epoch {epoch} (ACC: {best_acc:.4f})"
+                )
+                artifact.add_file(best_model_path)
+                wandb.log_artifact(artifact)
+                
+                # 2. Force upload to Files tab immediately
+                wandb.save(best_model_path, base_path=cfg.root_dir, policy="now")
+                print(f"✓ Uploaded best model to WandB Files: {best_model_path}")
 
         if cfg.earlystop:
             early_stopping(val_results["ACC"], trainer)
