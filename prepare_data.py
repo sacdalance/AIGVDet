@@ -18,19 +18,28 @@ from utils.utils import InputPadder
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def load_image(imfile):
+    """
+    Load an image, convert to tensor, and move to the appropriate device.
+    """
     img = np.array(Image.open(imfile)).astype(np.uint8)
-    img = torch.from_numpy(img).permute(2, 0, 1).float()
+        
     return img[None].to(DEVICE)
 
 def save_flow(img, flo, output_path):
-    img = img[0].permute(1,2,0).cpu().numpy()
-    flo = flo[0].permute(1,2,0).cpu().numpy()
-    
-    # map flow to rgb image
+    """
+    Save optical flow as a color image.
+    """
+    img = img[0].permute(1, 2, 0).cpu().numpy()
+    flo = flo[0].permute(1, 2, 0).cpu().numpy()
+
+    # Convert flow to RGB
     flo = flow_viz.flow_to_image(flo)
     cv2.imwrite(output_path, flo)
 
 def video_to_frames(video_path, output_folder):
+    """
+    Extract frames from a video and save them as images in the output folder.
+    """
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     
@@ -53,11 +62,15 @@ def video_to_frames(video_path, output_folder):
     
     cap.release()
     
+    # Return sorted list of extracted frame files
     images = glob.glob(os.path.join(output_folder, '*.png')) + \
              glob.glob(os.path.join(output_folder, '*.jpg'))
     return sorted(images)
 
 def process_dataset(args):
+    """
+    Process each video in the dataset, extracting frames and computing optical flow.
+    """
     # Load RAFT model once
     print(f"Loading RAFT model from {args.model}...")
     model = torch.nn.DataParallel(RAFT(args))
@@ -83,10 +96,8 @@ def process_dataset(args):
         for video_path in tqdm(videos, desc=f"Processing {label}"):
             video_name = os.path.splitext(os.path.basename(video_path))[0]
             
-            # Define output paths
-            # Original frames: args.output_rgb_dir / label / video_name / frames
+            # Define output paths for RGB frames and optical flow
             rgb_out_dir = os.path.join(args.output_rgb_dir, label, video_name)
-            # Optical flow: args.output_flow_dir / label / video_name / frames
             flow_out_dir = os.path.join(args.output_flow_dir, label, video_name)
             
             if not os.path.exists(flow_out_dir):
@@ -100,7 +111,7 @@ def process_dataset(args):
                 continue
 
             # 2. Generate Optical Flow
-            # Check if flow already exists
+            # Check if flow already exists for the extracted frames
             existing_flow = glob.glob(os.path.join(flow_out_dir, "*.png"))
             if len(existing_flow) >= len(images) - 1:
                 continue
@@ -114,28 +125,34 @@ def process_dataset(args):
                     if os.path.exists(flow_output_path):
                         continue
 
+                    # Load the consecutive frames
                     image1 = load_image(imfile1)
                     image2 = load_image(imfile2)
 
+                    # Pad images if necessary
                     padder = InputPadder(image1.shape)
                     image1, image2 = padder.pad(image1, image2)
 
+                    # Compute flow with the RAFT model
                     flow_low, flow_up = model(image1, image2, iters=20, test_mode=True)
                     
+                    # Save the optical flow
                     save_flow(image1, flow_up, flow_output_path)
 
 if __name__ == '__main__':
+    # Parse command-line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('--source_dir', required=True, help="Path to folder containing 0_real/1_fake video folders")
     parser.add_argument('--output_rgb_dir', required=True, help="Output path for RGB frames")
     parser.add_argument('--output_flow_dir', required=True, help="Output path for Optical Flow frames")
     parser.add_argument('--model', default="raft_model/raft-things.pth", help="Path to RAFT model checkpoint")
     
-    # RAFT args
-    parser.add_argument('--small', action='store_true', help='use small model')
-    parser.add_argument('--mixed_precision', action='store_true', help='use mixed precision')
-    parser.add_argument('--alternate_corr', action='store_true', help='use efficent correlation implementation')
+    # RAFT arguments
+    parser.add_argument('--small', action='store_true', help='Use small model')
+    parser.add_argument('--mixed_precision', action='store_true', help='Use mixed precision')
+    parser.add_argument('--alternate_corr', action='store_true', help='Use efficient correlation implementation')
     
     args = parser.parse_args()
     
+    # Process the dataset with the provided arguments
     process_dataset(args)
