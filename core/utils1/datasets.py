@@ -40,34 +40,34 @@ def binary_dataset(root: str, cfg: CONFIGCLASS):
         rz_func = identity_transform
 
     # Crop to cfg.cropSize (paper uses 448)
-    if cfg.isTrain:
+    if cfg.isTrain and not cfg.optical_crop:  # standard RGB training
         crop_func = transforms.RandomCrop((cfg.cropSize, cfg.cropSize))
     else:
         crop_func = transforms.CenterCrop((cfg.cropSize, cfg.cropSize)) if cfg.aug_crop else identity_transform
 
-    # Flip only in training if enabled
+    # Flip only in training if enabled (disabled for optical flow)
     if cfg.isTrain and cfg.aug_flip:
         flip_func = transforms.RandomHorizontalFlip()
     else:
-        flip_func = identity_transform # fallback
+        flip_func = identity_transform  # fallback
 
 
     return datasets.ImageFolder(
         root,
         transforms.Compose(
             [
-                rz_func,
-                #change
-                crop_func,
-                transforms.Lambda(lambda img: blur_jpg_augment(img, cfg)),
-                flip_func,
-                transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-                if cfg.aug_norm
-                else identity_transform,
-            ]
+                    rz_func,
+                    #change 
+                    crop_func,
+                    transforms.Lambda(lambda img: blur_jpg_augment(img, cfg)),
+                    flip_func,
+                    transforms.ToTensor(),
+                    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+                    if cfg.aug_norm
+                    else identity_transform,
+                ]
+            )
         )
-    )
 
 
 class FileNameDataset(datasets.ImageFolder):

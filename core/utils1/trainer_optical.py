@@ -19,7 +19,7 @@ class BaseModel(nn.Module):
         self.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         self.model:nn.Module
         # self.model.to(self.device)
-        #self.model.load_state_dict(torch.load('./checkpoints/optical.pth'))
+        self.model.load_state_dict(torch.load('./checkpoints/optical.pth'))
         self.optimizer: torch.optim.Optimizer
 
     def save_networks(self, epoch: int):

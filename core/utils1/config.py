@@ -25,18 +25,19 @@ class DefaultConfigs(ABC):
     # data augmentation - to match the paper's augmentation rate (10%), set blur and jpg to 0.5
     rz_interp = ["bilinear"]
     # blur_prob = 0.1 - resnet50 template
-    blur_prob = 0.05
+    blur_prob = 0 # optical flow
     blur_sig = [0.5]
     # jpg_prob = 0.1 - resnet50 template
-    jpg_prob = 0.05
+    jpg_prob = 0 # optical flow
     # P(augmented) = 1-(1-0.5)(1-0.05) = 0.9
     jpg_method = ["cv2"]
     jpg_qual = list(range(70, 91))
     gray_prob = 0.0
     aug_resize = True
-    aug_crop = True
-    aug_flip = True
-    aug_norm = True
+    optical_crop = True # comment out to disable cropping
+    aug_crop = True 
+    aug_flip = False # optical flow
+    aug_norm = False # optical flow
 
     ####### train setting ######
     warmup = False
