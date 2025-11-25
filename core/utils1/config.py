@@ -34,10 +34,9 @@ class DefaultConfigs(ABC):
     jpg_qual = list(range(70, 91))
     gray_prob = 0.0
     aug_resize = True
-    optical_crop = True # comment out to disable cropping
     aug_crop = True 
-    aug_flip = False # optical flow
-    aug_norm = False # optical flow
+    aug_flip = True # optical flow
+    aug_norm = True # optical flow
 
     ####### train setting ######
     warmup = False

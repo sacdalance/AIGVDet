@@ -206,7 +206,7 @@ def main():
     )
     parser.add_argument(
         '--data-id',
-        default='1YO3qRKbWxOYEm86Vy9QlGMjyi5Q_A6m0',
+        default='1BGsUw_A7YT3fCuaCMXcaSMQBBvDyE_59  ',
         help='Google Drive file ID for dataset (default: from original script)'
     )
     parser.add_argument(
