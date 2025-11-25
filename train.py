@@ -64,11 +64,6 @@ if __name__ == "__main__":
     )
     print(f"✓ wandb tracking enabled: {wandb.run.url}")
 
-    # Define metrics to track max value in summary table
-    wandb.define_metric("val/ACC", summary="max")
-    wandb.define_metric("val/AUC", summary="max")
-    wandb.define_metric("val/AP", summary="max")
-
     print("\nInitializing model...")
     trainer = Trainer(cfg)
     early_stopping = EarlyStopping(patience=cfg.earlystop_epoch, delta=-0.001, verbose=True)
@@ -148,7 +143,6 @@ if __name__ == "__main__":
             best_acc = val_results['ACC']
             
             # Explicitly update summary for the table with ALL metrics from this best epoch
-            wandb.run.summary["best_acc_score"] = best_acc
             wandb.run.summary["best_epoch"] = epoch
             wandb.run.summary["best_AUC"] = val_results["AUC"]
             wandb.run.summary["best_AP"] = val_results["AP"]
