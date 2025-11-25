@@ -44,6 +44,4 @@ class EarlyStopping:
         if self.verbose:
             print(f"Validation accuracy increased ({self.score_max:.6f} --> {score:.6f}).")
         # trainer.save_networks("best") - Handled globally in train.py to avoid overwriting with local bests
-        self.score_max = score
-        
-        self.score_max = score
+        self.score_max = score  
