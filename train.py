@@ -64,6 +64,11 @@ if __name__ == "__main__":
     )
     print(f"✓ wandb tracking enabled: {wandb.run.url}")
 
+    # Define metrics to track max value in summary table
+    wandb.define_metric("val/ACC", summary="max")
+    wandb.define_metric("val/AUC", summary="max")
+    wandb.define_metric("val/AP", summary="max")
+
     print("\nInitializing model...")
     trainer = Trainer(cfg)
     early_stopping = EarlyStopping(patience=cfg.earlystop_epoch, delta=-0.001, verbose=True)
@@ -128,6 +133,7 @@ if __name__ == "__main__":
             "val/AUC": val_results["AUC"],
             "val/TPR": val_results["TPR"],
             "val/TNR": val_results["TNR"],
+            "val/best_ACC": max(best_acc, val_results["ACC"]),
             "epoch": epoch
         })
         
@@ -137,7 +143,22 @@ if __name__ == "__main__":
         # Save best model if accuracy improves
         if val_results['ACC'] > best_acc:
             print(f"⭐ New best model! (ACC: {best_acc:.4f} -> {val_results['ACC']:.4f})")
+            # Calculate improvement
+            improvement = val_results['ACC'] - best_acc
             best_acc = val_results['ACC']
+            
+            # Explicitly update summary for the table with ALL metrics from this best epoch
+            wandb.run.summary["best_acc_score"] = best_acc
+            wandb.run.summary["best_epoch"] = epoch
+            wandb.run.summary["best_AUC"] = val_results["AUC"]
+            wandb.run.summary["best_AP"] = val_results["AP"]
+            wandb.run.summary["best_TPR"] = val_results["TPR"]
+            wandb.run.summary["best_TNR"] = val_results["TNR"]
+            
+            # Force update the specific columns you want in the table
+            wandb.run.summary["best_model/score"] = best_acc
+            wandb.run.summary["best_model/improvement"] = improvement
+            
             trainer.save_networks("best")
             
             best_model_path = os.path.join(cfg.ckpt_dir, "model_epoch_best.pth")

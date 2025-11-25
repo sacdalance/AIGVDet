@@ -42,13 +42,8 @@ class EarlyStopping:
     def save_checkpoint(self, score: float, trainer: Trainer):
         """Saves model when validation loss decrease."""
         if self.verbose:
-            print(f"Validation accuracy increased ({self.score_max:.6f} --> {score:.6f}).  Saving model ...")
-        trainer.save_networks("best")
+            print(f"Validation accuracy increased ({self.score_max:.6f} --> {score:.6f}).")
+        # trainer.save_networks("best") - Handled globally in train.py to avoid overwriting with local bests
         self.score_max = score
         
-        # Log best model save to wandb
-        if wandb.run is not None:
-            wandb.log({
-                "best_model/score": score,
-                "best_model/improvement": score - self.score_max if self.score_max != -np.Inf else 0
-            })
+        self.score_max = score
