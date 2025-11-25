@@ -11,7 +11,7 @@ import wandb
 from core.utils1.datasets import create_dataloader
 from core.utils1.earlystop import EarlyStopping
 from core.utils1.eval import get_val_cfg, validate
-from core.utils1.trainer_optical import Trainer # change this if optical or rgb
+from core.utils1.trainer import Trainer # change
 from core.utils1.utils import Logger
 
 import ssl
