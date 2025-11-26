@@ -29,7 +29,7 @@ class DefaultConfigs(ABC):
     blur_sig = [0.5]
     # jpg_prob = 0.1 - resnet50 template
     jpg_prob = 0.1 # optical flow
-    # P(augmented) = 1-(1-0.5)(1-0.05) = 0.9
+    # P(augmented) = 1-(1-0.5)(1-0.05) = 0.975
     jpg_method = ["cv2"]
     jpg_qual = list(range(70, 91))
     gray_prob = 0.0

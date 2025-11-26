@@ -40,7 +40,7 @@ def binary_dataset(root: str, cfg: CONFIGCLASS):
         rz_func = identity_transform
 
     # Crop to cfg.cropSize (paper uses 448)
-    if cfg.isTrain and not cfg.optical_crop:  # standard RGB training
+    if cfg.isTrain:
         crop_func = transforms.RandomCrop((cfg.cropSize, cfg.cropSize))
     else:
         crop_func = transforms.CenterCrop((cfg.cropSize, cfg.cropSize)) if cfg.aug_crop else identity_transform
