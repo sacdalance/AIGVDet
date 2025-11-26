@@ -63,13 +63,15 @@ def validate(model: nn.Module, cfg: CONFIGCLASS):
     tpr = f_acc  # TPR is the accuracy on fake samples (class 1)
     tnr = r_acc  # TNR is the accuracy on real samples (class 0)
     
+
+    # added values for results - wandb integration
     results = {
         "ACC": acc,
         "AP": ap,
         "AUC": auc,
-        "R_ACC": r_acc,
+        "R_ACC": r_acc, 
         "F_ACC": f_acc,
-        "TPR": tpr,
-        "TNR": tnr,
+        "TPR": tpr, # True Positive Rate / Recall
+        "TNR": tnr, # True Negative Rate / Specificity
     }
     return results

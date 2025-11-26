@@ -149,10 +149,10 @@ rz_dict = {'bilinear': Image.BILINEAR,
            'bicubic': Image.BICUBIC,
            'lanczos': Image.LANCZOS,
            'nearest': Image.NEAREST}
-def custom_resize(img: Image.Image, cfg: CONFIGCLASS) -> Image.Image:
+
+def custom_resize(img: Image.Image, cfg: CONFIGCLASS) -> Image.Image: # added to implement 70 to 90
     interp = sample_discrete(cfg.rz_interp)
     return TF.resize(img, cfg.loadSize, interpolation=rz_dict[interp])
-
 
 def get_dataset(cfg: CONFIGCLASS):
     dset_lst = []

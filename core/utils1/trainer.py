@@ -20,6 +20,7 @@ class BaseModel(nn.Module):
         self.model:nn.Module
         # self.model.to(self.device)
         #self.model.load_state_dict(torch.load('./checkpoints/optical.pth'))
+        # removed self.model=nnModule.to(self.device) breaks the model assignment
         self.optimizer: torch.optim.Optimizer
 
     def save_networks(self, epoch: int):
