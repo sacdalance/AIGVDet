@@ -57,9 +57,8 @@ def binary_dataset(root: str, cfg: CONFIGCLASS):
         transforms.Compose(
             [
                     rz_func,
-                    #change 
+                    transforms.Lambda(lambda img: blur_jpg_augment(img, cfg)), #change 
                     crop_func,
-                    transforms.Lambda(lambda img: blur_jpg_augment(img, cfg)),
                     flip_func,
                     transforms.ToTensor(),
                     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
