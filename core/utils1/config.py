@@ -10,8 +10,8 @@ class DefaultConfigs(ABC):
     gpus = [0]
     seed = 3407
     arch = "resnet50"
-    datasets = ["trainset_1"]
-    datasets_test = ["val_set_1"]
+    datasets = ["trainset_1"]  # Changed from trainset_1 to match test/train structure
+    datasets_test = ["val_set_1"]  # Changed from val_set_1 to match test/val structure
     mode = "binary"
     class_bal = False
     batch_size = 64 # RTX 3090 24GB can handle original batch size
