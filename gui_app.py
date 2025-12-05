@@ -96,6 +96,15 @@ with tab1:
     # Model Upload
     raft_model_file = st.file_uploader("Upload RAFT Model (raft.pth)", type=['pth'], key="raft_uploader")
     
+    # Check file size (500MB limit)
+    if raft_model_file:
+        file_size_mb = raft_model_file.size / (1024 * 1024)
+        if file_size_mb > 500:
+            st.error(f"File size ({file_size_mb:.1f} MB) exceeds 500MB limit. Please upload a smaller model.")
+            raft_model_file = None
+        else:
+            st.success(f"Model size: {file_size_mb:.1f} MB")
+    
     # Video Upload (Batch or Solo)
     uploaded_videos = st.file_uploader("Upload Video(s)", type=['mp4', 'avi', 'mov', 'mkv'], accept_multiple_files=True, key="video_uploader")
     
@@ -103,6 +112,8 @@ with tab1:
     output_root = st.text_input("Output Directory Root", value="output_data")
     
     if st.button("Start Extraction", key="extract_btn"):
+        extraction_start_time = time.time()
+        
         if not raft_model_file:
             st.error("Please upload the RAFT model.")
         elif not uploaded_videos:
@@ -141,6 +152,7 @@ with tab1:
                 total_videos = len(uploaded_videos)
                 
                 for i, video_file in enumerate(uploaded_videos):
+                    video_start_time = time.time()
                     video_name = video_file.name
                     st.subheader(f"Processing: {video_name} ({i+1}/{total_videos})")
                     
@@ -156,15 +168,18 @@ with tab1:
                     
                     # 1. Extract Frames
                     st.write("Extracting frames...")
+                    frame_start = time.time()
                     p_bar = st.progress(0)
                     images = video_to_frames(video_path, frame_output_dir, p_bar)
-                    st.write(f"Extracted {len(images)} frames to `{frame_output_dir}`")
+                    frame_duration = time.time() - frame_start
+                    st.write(f"✓ Extracted {len(images)} frames to `{frame_output_dir}` in {frame_duration:.2f}s")
                     
                     # 2. Generate Optical Flow
                     if not os.path.exists(flow_output_dir):
                         os.makedirs(flow_output_dir)
                     
                     st.write("Generating Optical Flow...")
+                    flow_start = time.time()
                     images = natsorted(images)
                     flow_p_bar = st.progress(0)
                     
@@ -182,12 +197,17 @@ with tab1:
                             
                             flow_p_bar.progress((idx + 1) / (len(images) - 1))
                     
-                    st.write(f"Optical Flow saved to `{flow_output_dir}`")
+                    flow_duration = time.time() - flow_start
+                    st.write(f"✓ Optical Flow saved to `{flow_output_dir}` in {flow_duration:.2f}s")
+                    
+                    video_duration = time.time() - video_start_time
+                    st.info(f"**Video processed in {video_duration:.2f} seconds**")
                     
                     # Cleanup temp video
                     os.remove(video_path)
                 
-                st.success("All videos processed!")
+                total_extraction_time = time.time() - extraction_start_time
+                st.success(f"✓ All videos processed! Total time: {total_extraction_time:.2f} seconds")
                 # Cleanup temp model
                 os.remove(raft_model_path)
                 
@@ -203,8 +223,23 @@ with tab2:
     col1, col2 = st.columns(2)
     with col1:
         optical_model_file = st.file_uploader("Upload Optical Flow Model (optical.pth)", type=['pth'], key="opt_uploader")
+        if optical_model_file:
+            opt_size_mb = optical_model_file.size / (1024 * 1024)
+            if opt_size_mb > 500:
+                st.error(f"File size ({opt_size_mb:.1f} MB) exceeds 500MB limit.")
+                optical_model_file = None
+            else:
+                st.success(f"Optical model: {opt_size_mb:.1f} MB")
+    
     with col2:
         original_model_file = st.file_uploader("Upload RGB Model (original.pth)", type=['pth'], key="orig_uploader")
+        if original_model_file:
+            orig_size_mb = original_model_file.size / (1024 * 1024)
+            if orig_size_mb > 500:
+                st.error(f"File size ({orig_size_mb:.1f} MB) exceeds 500MB limit.")
+                original_model_file = None
+            else:
+                st.success(f"RGB model: {orig_size_mb:.1f} MB")
         
     # Input for processed data path
     # Default to the output of Tab 1 if available
@@ -278,6 +313,7 @@ with tab2:
                 results = []
                 
                 for vid_folder in video_folders:
+                    video_detect_start = time.time()
                     st.subheader(f"Analyzing: {vid_folder}")
                     
                     rgb_path = os.path.join(frames_root, vid_folder)
@@ -294,6 +330,7 @@ with tab2:
                     
                     rgb_prob_sum = 0
                     rgb_bar = st.progress(0, text="RGB Detection")
+                    rgb_start = time.time()
                     
                     for i, img_path in enumerate(rgb_files):
                         img = Image.open(img_path).convert("RGB")
@@ -307,8 +344,9 @@ with tab2:
                         
                         rgb_bar.progress((i + 1) / len(rgb_files))
                     
+                    rgb_duration = time.time() - rgb_start
                     rgb_score = rgb_prob_sum / len(rgb_files) if rgb_files else 0
-                    st.write(f"RGB Score: {rgb_score:.4f}")
+                    st.write(f"✓ RGB Score: {rgb_score:.4f} ({len(rgb_files)} frames in {rgb_duration:.2f}s)")
                     
                     # Optical Flow Detection
                     opt_files = sorted(glob.glob(os.path.join(opt_path, "*.jpg")) + 
@@ -317,6 +355,7 @@ with tab2:
                     
                     opt_prob_sum = 0
                     opt_bar = st.progress(0, text="Optical Flow Detection")
+                    opt_start = time.time()
                     
                     for i, img_path in enumerate(opt_files):
                         img = Image.open(img_path).convert("RGB")
@@ -329,17 +368,21 @@ with tab2:
                             opt_prob_sum += prob
                             
                         opt_bar.progress((i + 1) / len(opt_files))
-                        
+                    
+                    opt_duration = time.time() - opt_start    
                     opt_score = opt_prob_sum / len(opt_files) if opt_files else 0
-                    st.write(f"Optical Flow Score: {opt_score:.4f}")
+                    st.write(f"✓ Optical Flow Score: {opt_score:.4f} ({len(opt_files)} frames in {opt_duration:.2f}s)")
                     
                     # Final Decision
                     final_score = (rgb_score * 0.5) + (opt_score * 0.5)
                     decision = "FAKE VIDEO (AI-Generated)" if final_score >= threshold else "REAL VIDEO"
                     color = "red" if final_score >= threshold else "green"
                     
+                    video_detect_duration = time.time() - video_detect_start
+                    
                     st.markdown(f"### Result: :{color}[{decision}]")
                     st.write(f"**Combined Probability:** {final_score:.4f}")
+                    st.write(f"**Detection Time:** {video_detect_duration:.2f}s")
                     st.divider()
                     
                     results.append({
