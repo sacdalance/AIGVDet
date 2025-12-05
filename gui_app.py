@@ -117,12 +117,16 @@ with tab1:
             
             # Load RAFT
             try:
-                # Mock args for RAFT
+                # Args object for RAFT - needs to support 'in' operator
                 class Args:
-                    model = raft_model_path
-                    small = False
-                    mixed_precision = False
-                    alternate_corr = False
+                    def __init__(self):
+                        self.model = raft_model_path
+                        self.small = False
+                        self.mixed_precision = False
+                        self.alternate_corr = False
+                    
+                    def __contains__(self, key):
+                        return hasattr(self, key)
                 
                 args = Args()
                 model = torch.nn.DataParallel(RAFT(args))
