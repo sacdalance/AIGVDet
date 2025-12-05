@@ -36,9 +36,10 @@ def save_flow(img, flo, output_path):
     flo = flow_viz.flow_to_image(flo)
     cv2.imwrite(output_path, flo)
 
-def video_to_frames(video_path, output_folder):
+def video_to_frames(video_path, output_folder, max_frames=95):
     """
     Extract frames from a video and save them as images in the output folder.
+    Limits to max_frames (default 95) to match paper methodology.
     """
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
@@ -46,12 +47,12 @@ def video_to_frames(video_path, output_folder):
     # Check if frames already exist to skip
     existing_frames = glob.glob(os.path.join(output_folder, "*.png"))
     if len(existing_frames) > 0:
-        return sorted(existing_frames)
+        return sorted(existing_frames)[:max_frames]
 
     cap = cv2.VideoCapture(video_path)
     frame_count = 0
     
-    while cap.isOpened():
+    while cap.isOpened() and frame_count < max_frames:
         ret, frame = cap.read()
         if not ret:
             break
@@ -65,7 +66,7 @@ def video_to_frames(video_path, output_folder):
     # Return sorted list of extracted frame files
     images = glob.glob(os.path.join(output_folder, '*.png')) + \
              glob.glob(os.path.join(output_folder, '*.jpg'))
-    return sorted(images)
+    return sorted(images)[:max_frames]
 
 def process_dataset(args):
     """

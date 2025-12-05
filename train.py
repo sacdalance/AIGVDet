@@ -122,6 +122,29 @@ if __name__ == "__main__":
         val_writer.add_scalar("TNR", val_results["TNR"], trainer.total_steps)
         
         # Log validation metrics to wandb
+                    "saving the latest model %s (epoch %d, model.total_steps %d)\n"
+                    % (cfg.exp_name, epoch, trainer.total_steps)
+                )
+                trainer.save_networks("latest")
+
+        if epoch % cfg.save_epoch_freq == 0:
+            print(f"💾 Saving epoch checkpoint {epoch+1}")
+            log.write("saving the model at the end of epoch %d, iters %d\n" % (epoch, trainer.total_steps))
+            trainer.save_networks("latest")
+            trainer.save_networks(epoch)
+
+        # Validation
+        print("\n🔍 Running validation...")
+        trainer.eval()
+        val_results = validate(trainer.model, val_cfg)
+        val_writer.add_scalar("AP", val_results["AP"], trainer.total_steps)
+        val_writer.add_scalar("ACC", val_results["ACC"], trainer.total_steps)
+        # add
+        val_writer.add_scalar("AUC", val_results["AUC"], trainer.total_steps)
+        val_writer.add_scalar("TPR", val_results["TPR"], trainer.total_steps)
+        val_writer.add_scalar("TNR", val_results["TNR"], trainer.total_steps)
+        
+        # Log validation metrics to wandb
         wandb.log({
             "val/AP": val_results["AP"],
             "val/ACC": val_results["ACC"],
